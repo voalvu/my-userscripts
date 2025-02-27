@@ -10,16 +10,18 @@
 (function() {
     'use strict';
 
-    const BUTTON_XPATH = '/html/body/div/div/div[1]/div[2]/div[1]/div[4]/div/ul/li[2]/div/a';
-    const SELECTORS = {
+    //const BUTTON_XPATH = '/html/body/div/div/div[1]/div[2]/div[1]/div[4]/div/ul/li[2]/div/a';
+    //const BUTTOn_XPATH = '/html/body/div/div/div[1]/div[2]/div[1]/div[5]/div/ul/li[2]/div/a';
+  const SELECTORS = {
         remove: ['.OwauVllX', '.TZgqctN1'],
         flex: '._RHBaSfJ',
         width: '.WuDqSfpG',
-        participles: { section: '#sd-participles-section', container: '.uVbNQIMZ' }
+        participles: { section: '#sd-participles-section', container: '.uVbNQIMZ' },
+        click: "a[href='/conjugate/construir']"
     };
 
     const clickButton = () => {
-        const button = document.evaluate(BUTTON_XPATH, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        const button = document.querySelector(SELECTORS.click);
         if (button) button.click();
     };
 
@@ -37,8 +39,8 @@
     };
 
     const observer = new MutationObserver(() => {
-        cleanAndFormatPage();
         clickButton();
+        cleanAndFormatPage();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
