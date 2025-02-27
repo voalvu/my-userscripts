@@ -9,15 +9,13 @@
 // ==/UserScript==
 (function() {
     'use strict';
-
-    //const BUTTON_XPATH = '/html/body/div/div/div[1]/div[2]/div[1]/div[4]/div/ul/li[2]/div/a';
-    //const BUTTOn_XPATH = '/html/body/div/div/div[1]/div[2]/div[1]/div[5]/div/ul/li[2]/div/a';
+    
   const SELECTORS = {
         remove: ['.OwauVllX', '.TZgqctN1'],
         flex: '._RHBaSfJ',
         width: '.WuDqSfpG',
         participles: { section: '#sd-participles-section', container: '.uVbNQIMZ' },
-        click: "a[href='/conjugate/construir']"
+        click: "a[href*='/conjugate/']:not(.tCur1iYh)"
     };
 
     const clickButton = () => {
