@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         minimuxxerD - download muxxed audio-video streams from your x timeline
-// @namespace    
+// @namespace
 // @version      0.3
 // @description  Bypassing requirement of external muxer, ffmpeg etc. by using MediaStream and manually splice a working mp4 file together from the binary data supplied to a MediaStream. IMPORTANT: IF YOU USE THIS TOOL, ONLY USE IT TO DOWNLOAD PUBLIC DOMAIN OR YOUR OWN UPLOADED MEDIA.
 // @match        https://x.com/*
@@ -268,13 +268,14 @@
         // Function to create and insert download buttons with custom cursor
     function addDownloadButtons(videoId) {
         const videoContainers = Array.from(document.querySelectorAll('video[aria-label="Embedded video"]'));
-      console.log(videoContainers)
+        //console.log(videoContainers)
         const videoContainer = videoContainers.find(v => v.poster.includes(videoId));
         if (!videoContainer) {
             console.error('Video container not found.');
             return;
         }
         console.log('found videoContainer',videoContainer,videoId)
+        document.querySelector(`#vid-${videoId}`).remove()
 
         const videoMedia = medias.find(m => m.id === videoId && m.initVideoSeg !== null);
         const audioMedia = medias.find(m => m.id === videoId && m.initAudioSeg !== null);
@@ -764,6 +765,7 @@
     }
     let prevVideoContainersCount = 0
     let prevIds = []
+    let vcIdsWithloadingAdded = []
     const observer = new MutationObserver((mutations, obs) => {
         const videoContainers = document.querySelectorAll('video[aria-label="Embedded video"]');
         const currIds = []
@@ -777,9 +779,49 @@
           console.log('container count decreased')
         }
         for(let vc of videoContainers){
+          const vcId = vc.poster.split('/')[4]
           console.log(vc.poster.split('/')[4])
-          currIds.push(vc)
-        }
+          currIds.push(vcId)
+          if(!vcIdsWithloadingAdded.includes(vcId)){
+          const loadingIndicator = document.createElement('p');
+        loadingIndicator.textContent = 'Let video play before download...';
+        loadingIndicator.style = `
+            background: linear-gradient(45deg, #ffffff, #000000);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        `;
+        loadingIndicator.addEventListener('click', () => {
+            try{muxMedia(videoMedia,videoId)
+               }
+          catch{
+            console.error('HORRIBLE DISASTER')
+          }
+        });
+
+        // Insert buttons above the video player
+        const loadingContainer = document.createElement('div');
+        loadingContainer.style = `
+            position: absolute;
+            z-index: 9999;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        `;
+            loadingContainer.id = `vid-${vcId}`;
+        loadingContainer.appendChild(loadingIndicator);
+        vc.insertAdjacentElement('beforebegin', loadingContainer);
+          vcIdsWithloadingAdded.push(vcId)
+        console.log('wait for download added.');
+        }}
         console.log(prevIds,currIds);
         console.log(prevIds.filter(p=>currIds.includes(p)))
         console.log(currIds.filter(c=>prevIds.includes(c)))
